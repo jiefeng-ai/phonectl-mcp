@@ -2,7 +2,7 @@
 
 <h1 align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-dark.svg?v=4"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-light.svg?v=4" height="52" align="middle" alt=""></picture> phonectl-mcp</h1>
 
-<p align="center"><b>Let AI agents see and drive a real iPhone over USB.</b></p>
+<p align="center"><b>Let AI agents see and drive a real iPhone from your Mac, over USB or Wi-Fi.</b></p>
 
 <p align="center">
   <a href="https://pypi.org/project/phonectl-mcp/"><img src="https://img.shields.io/pypi/v/phonectl-mcp?logo=pypi&logoColor=white" alt="PyPI"></a>
@@ -15,12 +15,12 @@
 
 <p align="center"><a href="#install">Install</a> · <a href="#tools">Tools</a> · <a href="#troubleshooting">Troubleshooting</a> · <a href="#security">Security</a></p>
 
-An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone plugged into your Mac. Nothing to install on the phone, no jailbreak.
+An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone connected to your Mac. Nothing to install on the phone, no jailbreak.
 
 <table align="center">
   <tr>
     <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif" width="300" alt="An AI agent makes a rednote post through phonectl-mcp: text card, template, stickers, filter, title and caption"></td>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=2" width="300" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=3" width="300" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
   </tr>
   <tr>
     <td align="center"><sub>An AI agent makes a rednote post: text card, template, stickers, filter, caption. It stops before <b>Post</b>. Sped up.</sub></td>
@@ -32,7 +32,7 @@ An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, ap
 
 - A Mac with [uv](https://docs.astral.sh/uv/)
 - An iPhone on **iOS 27 or later**, with Developer Mode on
-- A USB data cable (not a charge-only one)
+- A USB data cable (not a charge-only one) for the first setup. After that, Wi-Fi works too
 
 Tested on an iPhone 17 Pro with iOS 27.2 and macOS 27.
 
@@ -83,6 +83,8 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 To check, ask your agent to take a screenshot of the phone.
 
+Once the phone has been set up over the cable, you can unplug it: while the phone and the Mac are on the same Wi-Fi, the server reaches it through macOS's own device service, the one Xcode uses for wireless debugging. Screenshots are a little slower (about 5 per second instead of 7). `phonectl doctor` still needs the cable for its phone checks.
+
 The phone keeps only one control connection to the Mac, so a single resident server owns it and every agent and script connects to that server. It does not stop two agents from tapping at once; let one drive at a time.
 
 ## Tools
@@ -128,7 +130,7 @@ Run `phonectl doctor` first. It tells you which link is broken.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `PHONECTL_UDID` | first USB iPhone | Which phone to use when several are connected |
+| `PHONECTL_UDID` | first connected iPhone | Which phone to use when several are connected |
 | `PHONECTL_PORT` | `47321` | HTTP port (127.0.0.1 only) |
 | `PHONECTL_TOKEN_FILE` | `~/.config/phonectl/token` | Where the token is kept |
 | `PHONECTL_SCALE` | `3` | Pixels per point; 2 on iPhone SE, XR, 11. Only affects screenshot size |

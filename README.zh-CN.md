@@ -2,7 +2,7 @@
 
 <h1 align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-dark.svg?v=4"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-light.svg?v=4" height="52" align="middle" alt=""></picture> phonectl-mcp</h1>
 
-<p align="center"><b>让 AI agent 通过 USB 线看见并操作一台真实的 iPhone。</b></p>
+<p align="center"><b>让 AI agent 从 Mac 上看见并操作一台真实的 iPhone，插线或走 Wi-Fi 都行。</b></p>
 
 <p align="center">
   <a href="https://pypi.org/project/phonectl-mcp/"><img src="https://img.shields.io/pypi/v/phonectl-mcp?logo=pypi&logoColor=white" alt="PyPI"></a>
@@ -15,12 +15,12 @@
 
 <p align="center"><a href="#安装">安装</a> · <a href="#工具">工具</a> · <a href="#排查问题">排查问题</a> · <a href="#安全">安全</a></p>
 
-一个 MCP 服务，对插在 Mac 上的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
+一个 MCP 服务，对连着 Mac 的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
 
 <table align="center">
   <tr>
     <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif" width="300" alt="AI agent 通过 phonectl-mcp 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、标题和正文"></td>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=2" width="300" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=3" width="300" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></td>
   </tr>
   <tr>
     <td align="center"><sub>AI agent 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、正文，停在<b>发布</b>前。已加速。</sub></td>
@@ -32,7 +32,7 @@
 
 - 一台装了 [uv](https://docs.astral.sh/uv/) 的 Mac
 - 一台 **iOS 27 或以上**的 iPhone，打开「开发者模式」
-- 一根能传数据的 USB 线（只能充电的不行）
+- 一根能传数据的 USB 线（只能充电的不行），首次设置时要用；之后走 Wi-Fi 也行
 
 已在 iPhone 17 Pro（iOS 27.2）+ macOS 27 上测试。
 
@@ -81,6 +81,8 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 装好后，让 agent 截一张手机屏幕试试。
 
+用数据线设置好之后，线可以拔掉：只要手机和 Mac 在同一个 Wi-Fi 下，服务会通过 macOS 自带的设备服务（Xcode 无线调试用的就是它）连上手机。截图会慢一点（每秒约 5 张，插线时约 7 张）。`phonectl doctor` 检查手机那几项目前仍需要插线。
+
 手机和 Mac 之间只保留一条控制连接，所以由一份常驻服务独占手机，所有 agent 和脚本都连它。它管不了两个 agent 同时点屏幕，同一时间请只让一方操作。
 
 ## 工具
@@ -126,7 +128,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 | 变量 | 默认值 | 含义 |
 | --- | --- | --- |
-| `PHONECTL_UDID` | 第一台 USB iPhone | 连了多台手机时用哪一台 |
+| `PHONECTL_UDID` | 第一台连上的 iPhone | 连了多台手机时用哪一台 |
 | `PHONECTL_PORT` | `47321` | HTTP 端口（只监听 127.0.0.1） |
 | `PHONECTL_TOKEN_FILE` | `~/.config/phonectl/token` | 令牌文件位置 |
 | `PHONECTL_SCALE` | `3` | 每 point 几个像素；iPhone SE、XR、11 填 2。只影响截图大小 |
