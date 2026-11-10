@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+.DS_Store
+.pytest_cache/
+# personal notes for Claude Code, not part of the project
+CLAUDE.local.md
