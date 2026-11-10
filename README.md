@@ -83,9 +83,9 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 To check, ask your agent to take a screenshot of the phone.
 
-Once the phone has been set up over the cable, you can unplug it: while the phone and the Mac are on the same Wi-Fi, the server reaches it through macOS's own device service, the one Xcode uses for wireless debugging. Screenshots are a little slower (about 5 per second instead of 7). Without the cable, `phonectl doctor` checks the phone through the server and skips trust, Developer Mode and the disk image, which need the cable.
+After one setup over the cable, it also works over Wi-Fi while the phone and the Mac share a network.
 
-The phone keeps only one control connection to the Mac, so a single resident server owns it and every agent and script connects to that server. It does not stop two agents from tapping at once; let one drive at a time.
+All agents and scripts share this one server, since the phone takes a single control connection; let one agent drive at a time.
 
 ## Tools
 
