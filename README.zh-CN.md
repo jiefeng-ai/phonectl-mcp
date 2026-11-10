@@ -4,6 +4,9 @@
 
 一个 MCP 服务：让 AI agent 通过 USB 线看见并操作一台真实的 iPhone，能截图、读屏幕文字、点按、滑动、打字、按硬件按钮、启动 App、读写剪贴板。**仅支持 macOS。**
 
+<p align="center"><img src="docs/demo.gif" width="358" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></p>
+<p align="center"><sub>脚本通过 phonectl-mcp 在招聘 App 里投递一个岗位：<code>read_text</code> 找按钮，<code>tap</code> 点下去。个人信息已打码，2 倍速。</sub></p>
+
 手机上不用装任何东西，也不用越狱。它用的是 iOS 对已信任 Mac 开放的开发者服务（Xcode 用的就是这套），点按和打字走 iOS 27 开放的 USB 输入通道。
 
 ## 需要什么
