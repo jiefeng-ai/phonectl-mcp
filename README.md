@@ -4,7 +4,7 @@
 
 An MCP server that lets AI agents see and drive a real iPhone over a USB cable: screenshots, the text on screen, taps, swipes, typing, hardware buttons, apps and the clipboard. **macOS only.**
 
-<p align="center"><img src="docs/demo.gif" width="358" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif" width="358" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></p>
 <p align="center"><sub>A script applying to one job in a recruiting app through phonectl-mcp: <code>read_text</code> finds the buttons, <code>tap</code> presses them. Personal details are pixelated; 2× speed.</sub></p>
 
 Nothing is installed on the phone and nothing is jailbroken. It uses the developer services iOS already exposes to a trusted Mac (the same ones Xcode uses), and the touch and keyboard input path that iOS 27 opened over USB.
