@@ -1,8 +1,19 @@
-# phonectl-mcp
+<h1 align="center">phonectl-mcp</h1>
 
-[![PyPI](https://img.shields.io/pypi/v/phonectl-mcp)](https://pypi.org/project/phonectl-mcp/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE) [English](https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.md)
+<p align="center"><b>让 AI agent 通过 USB 线看见并操作一台真实的 iPhone。</b></p>
 
-一个 MCP 服务：让 AI agent 通过 USB 线看见并操作一台真实的 iPhone，能截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。**仅支持 macOS。**
+<p align="center">
+  <a href="https://pypi.org/project/phonectl-mcp/"><img src="https://img.shields.io/pypi/v/phonectl-mcp?logo=pypi&logoColor=white" alt="PyPI"></a>
+  <img src="https://img.shields.io/badge/macOS-only-000?logo=apple&logoColor=white" alt="macOS only">
+  <img src="https://img.shields.io/badge/iOS-27%2B-000?logo=ios&logoColor=white" alt="iOS 27+">
+  <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-000?logo=modelcontextprotocol&logoColor=white" alt="MCP server"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/jiefeng-ai/phonectl-mcp/test.yml?branch=main&label=tests&logo=githubactions&logoColor=white" alt="Tests"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jiefeng-ai/phonectl-mcp" alt="License: MIT"></a>
+</p>
+
+<p align="center"><a href="#安装">安装</a> · <a href="#工具">工具</a> · <a href="#排查问题">排查问题</a> · <a href="#安全">安全</a> · <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.md">English</a></p>
+
+一个 MCP 服务，对插在 Mac 上的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
 
 <p align="center"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif" width="358" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></p>
 <p align="center"><sub>脚本在招聘 App 里投递一个岗位：<code>read_text</code> 找按钮，<code>tap</code> 点下去（2 倍速）。</sub></p>

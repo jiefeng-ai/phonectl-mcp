@@ -1,8 +1,19 @@
-# phonectl-mcp
+<h1 align="center">phonectl-mcp</h1>
 
-[![PyPI](https://img.shields.io/pypi/v/phonectl-mcp)](https://pypi.org/project/phonectl-mcp/) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE) [中文](https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.zh-CN.md)
+<p align="center"><b>Let AI agents see and drive a real iPhone over USB.</b></p>
 
-An MCP server that lets AI agents see and drive a real iPhone over USB: screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard. Nothing to install on the phone, no jailbreak. **macOS only.**
+<p align="center">
+  <a href="https://pypi.org/project/phonectl-mcp/"><img src="https://img.shields.io/pypi/v/phonectl-mcp?logo=pypi&logoColor=white" alt="PyPI"></a>
+  <img src="https://img.shields.io/badge/macOS-only-000?logo=apple&logoColor=white" alt="macOS only">
+  <img src="https://img.shields.io/badge/iOS-27%2B-000?logo=ios&logoColor=white" alt="iOS 27+">
+  <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-000?logo=modelcontextprotocol&logoColor=white" alt="MCP server"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/jiefeng-ai/phonectl-mcp/test.yml?branch=main&label=tests&logo=githubactions&logoColor=white" alt="Tests"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jiefeng-ai/phonectl-mcp" alt="License: MIT"></a>
+</p>
+
+<p align="center"><a href="#install">Install</a> · <a href="#tools">Tools</a> · <a href="#troubleshooting">Troubleshooting</a> · <a href="#security">Security</a> · <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.zh-CN.md">中文</a></p>
+
+An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone plugged into your Mac. Nothing to install on the phone, no jailbreak.
 
 <p align="center"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif" width="358" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></p>
 <p align="center"><sub>A script applying to a job in a recruiting app: <code>read_text</code> finds the buttons, <code>tap</code> presses them (2× speed).</sub></p>
