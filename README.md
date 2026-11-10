@@ -17,8 +17,16 @@
 
 An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone plugged into your Mac. Nothing to install on the phone, no jailbreak.
 
-<p align="center"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif" width="358" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></p>
-<p align="center"><sub>A script applying to a job in a recruiting app: <code>read_text</code> finds the buttons, <code>tap</code> presses them (2× speed).</sub></p>
+<table align="center">
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif" width="300" alt="An AI agent makes a rednote post through phonectl-mcp: text card, template, stickers, filter, title and caption"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=2" width="300" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>An AI agent makes a rednote post: text card, template, stickers, filter, caption. It stops before <b>Post</b>. Sped up.</sub></td>
+    <td align="center"><sub>A script applies to a job in a recruiting app: <code>read_text</code> finds the buttons, <code>tap</code> presses them. 2× speed.</sub></td>
+  </tr>
+</table>
 
 ## Requirements
 

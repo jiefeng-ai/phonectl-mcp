@@ -17,8 +17,16 @@
 
 一个 MCP 服务，对插在 Mac 上的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
 
-<p align="center"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif" width="358" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></p>
-<p align="center"><sub>脚本在招聘 App 里投递一个岗位：<code>read_text</code> 找按钮，<code>tap</code> 点下去（2 倍速）。</sub></p>
+<table align="center">
+  <tr>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif" width="300" alt="AI agent 通过 phonectl-mcp 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、标题和正文"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=2" width="300" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>AI agent 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、正文，停在<b>发布</b>前。已加速。</sub></td>
+    <td align="center"><sub>脚本在招聘 App 里投递一个岗位：<code>read_text</code> 找按钮，<code>tap</code> 点下去。2 倍速。</sub></td>
+  </tr>
+</table>
 
 ## 需要什么
 
