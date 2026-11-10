@@ -42,11 +42,7 @@
 
 把下面这段话发给你的编程 agent（Claude Code、Codex、Cursor 等）：
 
-```text
-安装 phonectl-mcp：https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand
-然后把它加进你的 MCP 配置，截一张我的手机屏幕确认能用。
-需要我在手机上操作时，一步步告诉我，等我做完再继续。
-```
+> 按 https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand 安装 phonectl-mcp，然后把它加进你的 MCP 配置，截一张我的手机屏幕确认能用。需要我在手机上操作时，一步步告诉我，等我做完再继续。
 
 ### 手动安装
 

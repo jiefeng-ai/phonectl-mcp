@@ -42,11 +42,7 @@ Tested on an iPhone 17 Pro with iOS 27.2 and macOS 27.
 
 Paste this to your coding agent (Claude Code, Codex, Cursor…):
 
-```text
-Install phonectl-mcp: https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand
-Then add it to your MCP config and take a screenshot of my phone to check it works.
-When I need to do something on the phone, tell me step by step and wait for me.
-```
+> Install phonectl-mcp by following https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand, then add it to your MCP config and take a screenshot of my phone to check it works. When I need to do something on the phone, tell me step by step and wait for me.
 
 ### Install by hand
 
