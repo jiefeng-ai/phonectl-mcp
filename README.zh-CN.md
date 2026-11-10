@@ -81,7 +81,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 装好后，让 agent 截一张手机屏幕试试。
 
-用数据线设置好之后，线可以拔掉：只要手机和 Mac 在同一个 Wi-Fi 下，服务会通过 macOS 自带的设备服务（Xcode 无线调试用的就是它）连上手机。截图会慢一点（每秒约 5 张，插线时约 7 张）。`phonectl doctor` 检查手机那几项目前仍需要插线。
+用数据线设置好之后，线可以拔掉：只要手机和 Mac 在同一个 Wi-Fi 下，服务会通过 macOS 自带的设备服务（Xcode 无线调试用的就是它）连上手机。截图会慢一点（每秒约 5 张，插线时约 7 张）。不插线时，`phonectl doctor` 通过服务检查手机，跳过信任、开发者模式和磁盘镜像这几项（它们需要插线）。
 
 手机和 Mac 之间只保留一条控制连接，所以由一份常驻服务独占手机，所有 agent 和脚本都连它。它管不了两个 agent 同时点屏幕，同一时间请只让一方操作。
 
@@ -112,7 +112,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 | 找不到 iPhone | 换能传数据的线，解锁手机后重插 |
 | 提示 Mac 未被信任 | 解锁手机，重插线，点「信任」 |
 | 找不到「开发者模式」 | 手机连着 Mac 时打开一次 Xcode，之后「设置 › 隐私与安全性」里会出现开关 |
-| 截图失败（比如手机重启后） | `phonectl doctor --fix` 装上开发者磁盘镜像 |
+| 截图失败（比如手机重启后） | 插上线，运行 `phonectl doctor --fix` 装上开发者磁盘镜像 |
 | 点了没反应 | 需要 iOS 27 及以上；保持屏幕亮着、不锁屏 |
 | 客户端连不上 | `phonectl restart`，再看 `~/Library/Logs/phonectl.error.log`。返回 401 说明客户端的令牌和 `~/.config/phonectl/token` 不一致 |
 

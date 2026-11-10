@@ -212,9 +212,68 @@ async def _server_status(srv, url: str) -> str:
                 return "\n".join(c.text for c in res.content if c.type == "text")
 
 
-async def _doctor(fix: bool) -> int:
+async def _usb_checks(r: _Report, usb: list, fix: bool) -> bool:
+    """Trust, iOS version, Developer Mode and the disk image, through usbmux. False: stop here."""
     from pymobiledevice3.lockdown import create_using_usbmux
     from pymobiledevice3.services.mobile_image_mounter import MobileImageMounterService, auto_mount
+
+    r.ok(f"iPhone on USB ({len(usb)} found{', using the first' if len(usb) > 1 else ''})")
+    try:
+        ld = await create_using_usbmux(serial=usb[0].serial, autopair=False)
+    except Exception as e:  # noqa: BLE001 - every failure here is reported, none is fatal to the Mac
+        r.fail(f"cannot talk to the phone ({e!r})", "Unlock the phone and replug the cable.")
+        return False
+    try:
+        if not ld.paired:
+            r.fail("this Mac is not trusted by the phone",
+                   "Unlock the phone, replug the cable and tap Trust (enter the passcode if asked).")
+            return False
+        r.ok("Mac is trusted")
+        version = ld.product_version
+        name = ld.all_values.get("DeviceName") or "iPhone"
+        major = int(version.split(".")[0])
+        if major >= MIN_INPUT_IOS:
+            r.ok(f"{name}, iOS {version}")
+        elif major >= MIN_IOS:
+            r.warn(f"{name}, iOS {version}: taps, swipes and typing need iOS {MIN_INPUT_IOS}+ "
+                   "(screenshots and apps may work; untested)",
+                   f"Update the phone to iOS {MIN_INPUT_IOS} or later for input.")
+        else:
+            r.fail(f"{name}, iOS {version}: too old", f"phonectl needs iOS {MIN_IOS}+, and iOS {MIN_INPUT_IOS}+ for input.")
+            return False
+        if await ld.get_developer_mode_status():
+            r.ok("Developer Mode is on")
+        else:
+            r.fail("Developer Mode is off",
+                   "On the phone: Settings > Privacy & Security > Developer Mode, turn it on and restart. "
+                   "If the switch is missing, open Xcode once with the phone connected.")
+            return False
+        try:
+            async with MobileImageMounterService(lockdown=ld) as m:
+                mounted = await m.is_image_mounted("Personalized")
+        except Exception as e:  # noqa: BLE001
+            r.fail(f"cannot check the developer disk image ({e!r})", "Unlock the phone and run doctor again.")
+            return False
+        if mounted:
+            r.ok("developer disk image is mounted")
+        elif fix:
+            print("        mounting the developer disk image (downloads it the first time)...")
+            try:
+                await auto_mount(ld)
+                r.ok("developer disk image mounted")
+            except Exception as e:  # noqa: BLE001
+                r.fail(f"mounting failed ({e!r})",
+                       "Keep the phone unlocked and online, then retry; or open Xcode once with the phone connected.")
+        else:
+            r.fail("developer disk image is not mounted (screenshots need it)",
+                   "Run `phonectl doctor --fix`, or open Xcode once with the phone connected.")
+    finally:
+        await ld.close()
+
+    return True
+
+
+async def _doctor(fix: bool) -> int:
     from pymobiledevice3.usbmux import list_devices
 
     import logging
@@ -237,61 +296,12 @@ async def _doctor(fix: bool) -> int:
     if udid:
         usb = [d for d in usb if d.serial == udid]
     if not usb:
-        r.fail("no iPhone on USB" + (f" with UDID {udid}" if udid else ""),
-               "Connect it with a data cable (not charge-only) and unlock it.")
+        # Without the cable the phone can still be reached over Wi-Fi through macOS's remoted,
+        # which only the server's tunnel can use: opening a second one would knock the server's
+        # off. So the server answers for the phone below, and the usbmux checks are skipped.
+        r.warn("no iPhone on USB" + (f" with UDID {udid}" if udid else "") + "; checking over Wi-Fi through the server")
+    elif not await _usb_checks(r, usb, fix):
         return 1
-    r.ok(f"iPhone on USB ({len(usb)} found{', using the first' if len(usb) > 1 else ''})")
-    try:
-        ld = await create_using_usbmux(serial=usb[0].serial, autopair=False)
-    except Exception as e:  # noqa: BLE001 - every failure here is reported, none is fatal to the Mac
-        r.fail(f"cannot talk to the phone ({e!r})", "Unlock the phone and replug the cable.")
-        return 1
-    try:
-        if not ld.paired:
-            r.fail("this Mac is not trusted by the phone",
-                   "Unlock the phone, replug the cable and tap Trust (enter the passcode if asked).")
-            return 1
-        r.ok("Mac is trusted")
-        version = ld.product_version
-        name = ld.all_values.get("DeviceName") or "iPhone"
-        major = int(version.split(".")[0])
-        if major >= MIN_INPUT_IOS:
-            r.ok(f"{name}, iOS {version}")
-        elif major >= MIN_IOS:
-            r.warn(f"{name}, iOS {version}: taps, swipes and typing need iOS {MIN_INPUT_IOS}+ "
-                   "(screenshots and apps may work; untested)",
-                   f"Update the phone to iOS {MIN_INPUT_IOS} or later for input.")
-        else:
-            r.fail(f"{name}, iOS {version}: too old", f"phonectl needs iOS {MIN_IOS}+, and iOS {MIN_INPUT_IOS}+ for input.")
-            return 1
-        if await ld.get_developer_mode_status():
-            r.ok("Developer Mode is on")
-        else:
-            r.fail("Developer Mode is off",
-                   "On the phone: Settings > Privacy & Security > Developer Mode, turn it on and restart. "
-                   "If the switch is missing, open Xcode once with the phone connected.")
-            return 1
-        try:
-            async with MobileImageMounterService(lockdown=ld) as m:
-                mounted = await m.is_image_mounted("Personalized")
-        except Exception as e:  # noqa: BLE001
-            r.fail(f"cannot check the developer disk image ({e!r})", "Unlock the phone and run doctor again.")
-            return 1
-        if mounted:
-            r.ok("developer disk image is mounted")
-        elif fix:
-            print("        mounting the developer disk image (downloads it the first time)...")
-            try:
-                await auto_mount(ld)
-                r.ok("developer disk image mounted")
-            except Exception as e:  # noqa: BLE001
-                r.fail(f"mounting failed ({e!r})",
-                       "Keep the phone unlocked and online, then retry; or open Xcode once with the phone connected.")
-        else:
-            r.fail("developer disk image is not mounted (screenshots need it)",
-                   "Run `phonectl doctor --fix`, or open Xcode once with the phone connected.")
-    finally:
-        await ld.close()
 
     print("Server")
     url = f"http://{srv.HTTP_HOST}:{srv.HTTP_PORT}/mcp"
@@ -313,7 +323,14 @@ async def _doctor(fix: bool) -> int:
                "Check the token and that the port is not used by another program.")
         return 1
     if "phone: connected" in status:
-        r.ok(f"server at {url} reaches the phone")
+        r.ok(f"server at {url} reaches the phone" + ("" if usb else " over Wi-Fi"))
+        if not usb:
+            r.warn("trust, Developer Mode and the disk image were not checked: they need the cable",
+                   "Plug in the cable and run doctor again to check them, or to mount the disk image with --fix.")
+    elif not usb:
+        r.fail("the phone is neither on USB nor reachable over Wi-Fi:\n        " + status.replace("\n", "\n        "),
+               "Connect it with a data cable (not charge-only) and unlock it. For Wi-Fi, set it up over "
+               "the cable once and keep the phone and the Mac on the same network.")
     else:
         r.fail("the server is up but cannot reach the phone:\n        " + status.replace("\n", "\n        "),
                "Replug the cable, unlock the phone, then `phonectl restart`.")

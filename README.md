@@ -83,7 +83,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 To check, ask your agent to take a screenshot of the phone.
 
-Once the phone has been set up over the cable, you can unplug it: while the phone and the Mac are on the same Wi-Fi, the server reaches it through macOS's own device service, the one Xcode uses for wireless debugging. Screenshots are a little slower (about 5 per second instead of 7). `phonectl doctor` still needs the cable for its phone checks.
+Once the phone has been set up over the cable, you can unplug it: while the phone and the Mac are on the same Wi-Fi, the server reaches it through macOS's own device service, the one Xcode uses for wireless debugging. Screenshots are a little slower (about 5 per second instead of 7). Without the cable, `phonectl doctor` checks the phone through the server and skips trust, Developer Mode and the disk image, which need the cable.
 
 The phone keeps only one control connection to the Mac, so a single resident server owns it and every agent and script connects to that server. It does not stop two agents from tapping at once; let one drive at a time.
 
@@ -114,7 +114,7 @@ Run `phonectl doctor` first. It tells you which link is broken.
 | No iPhone found | Use a data cable, unlock the phone, replug |
 | "Mac is not trusted" | Unlock the phone, replug, tap **Trust** |
 | No Developer Mode switch | Open Xcode once with the phone connected; the switch appears under Settings › Privacy & Security |
-| Screenshots fail (e.g. after the phone restarts) | `phonectl doctor --fix` mounts the developer disk image |
+| Screenshots fail (e.g. after the phone restarts) | Plug in the cable; `phonectl doctor --fix` mounts the developer disk image |
 | Taps do nothing | Needs iOS 27+; keep the screen on and unlocked |
 | Clients cannot connect | `phonectl restart`, then check `~/Library/Logs/phonectl.error.log`. A 401 means the client's token differs from `~/.config/phonectl/token` |
 
