@@ -1,11 +1,6 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-dark.svg">
-    <img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-light.svg" width="96" height="96" alt="phonectl-mcp logo">
-  </picture>
-</p>
+<p align="center"><a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.md">English</a> · 中文</p>
 
-<h1 align="center">phonectl-mcp</h1>
+<h1 align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-dark.svg"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-light.svg" height="38" align="middle" alt=""></picture> phonectl-mcp</h1>
 
 <p align="center"><b>让 AI agent 通过 USB 线看见并操作一台真实的 iPhone。</b></p>
 
@@ -18,7 +13,7 @@
   <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
 </p>
 
-<p align="center"><a href="#安装">安装</a> · <a href="#工具">工具</a> · <a href="#排查问题">排查问题</a> · <a href="#安全">安全</a> · <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.md">English</a></p>
+<p align="center"><a href="#安装">安装</a> · <a href="#工具">工具</a> · <a href="#排查问题">排查问题</a> · <a href="#安全">安全</a></p>
 
 一个 MCP 服务，对插在 Mac 上的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
 
