@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-dark.svg">
+    <img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/logo-light.svg" width="96" height="96" alt="phonectl-mcp logo">
+  </picture>
+</p>
+
 <h1 align="center">phonectl-mcp</h1>
 
 <p align="center"><b>让 AI agent 通过 USB 线看见并操作一台真实的 iPhone。</b></p>
