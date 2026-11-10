@@ -43,18 +43,9 @@ Tested on an iPhone 17 Pro with iOS 27.2 and macOS 27.
 Paste this to your coding agent (Claude Code, Codex, Cursor…):
 
 ```text
-Install phonectl-mcp on this Mac by following
-https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand.
-Install uv first if it is missing; if `phonectl` is not found afterwards,
-run `uv tool update-shell` or call `~/.local/bin/phonectl`.
-Run `phonectl doctor` and fix what it reports. For anything that needs my
-hands on the phone, such as trusting this Mac or turning on Developer Mode,
-tell me what to do step by step and wait for me.
-Then add the server to your own MCP config (streamable HTTP at
-http://127.0.0.1:47321/mcp, header
-`Authorization: Bearer <contents of ~/.config/phonectl/token>`)
-and take a screenshot of my phone to check that it works.
-If you have to restart to load the new tools, tell me.
+Install phonectl-mcp: https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand
+Then add it to your MCP config and take a screenshot of my phone to check it works.
+When I need to do something on the phone, tell me step by step and wait for me.
 ```
 
 ### Install by hand

@@ -43,16 +43,9 @@
 把下面这段话发给你的编程 agent（Claude Code、Codex、Cursor 等）：
 
 ```text
-按下面的说明在这台 Mac 上安装 phonectl-mcp：
-https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.zh-CN.md#手动安装
-没有 uv 就先装 uv；装完如果找不到 `phonectl` 命令，
-运行 `uv tool update-shell`，或直接用 `~/.local/bin/phonectl`。
-运行 `phonectl doctor`，按它的提示修好问题。需要我在手机上动手的
-（比如信任这台 Mac、打开开发者模式），一步步告诉我怎么做，等我做完再继续。
-最后把服务加进你自己的 MCP 配置（streamable HTTP，
-地址 http://127.0.0.1:47321/mcp，
-请求头 `Authorization: Bearer <~/.config/phonectl/token 的内容>`），
-截一张手机屏幕确认能用。如果要重启才能加载新工具，告诉我。
+安装 phonectl-mcp：https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand
+然后把它加进你的 MCP 配置，截一张我的手机屏幕确认能用。
+需要我在手机上操作时，一步步告诉我，等我做完再继续。
 ```
 
 ### 手动安装
