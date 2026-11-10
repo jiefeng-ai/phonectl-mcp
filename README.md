@@ -19,8 +19,8 @@ An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, ap
 
 <table align="center">
   <tr>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif" width="300" alt="An AI agent makes a rednote post through phonectl-mcp: text card, template, stickers, filter, title and caption"></td>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=3" width="300" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif?v=2" width="260" alt="An AI agent makes a rednote post through phonectl-mcp: text card, template, stickers, filter, title and caption"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=4" width="260" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
   </tr>
   <tr>
     <td align="center"><sub>An AI agent makes a rednote post: text card, template, stickers, filter, caption. It stops before <b>Post</b>. Sped up.</sub></td>
