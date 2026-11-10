@@ -7,8 +7,8 @@
   <img src="https://img.shields.io/badge/macOS-only-000?logo=apple&logoColor=white" alt="macOS only">
   <img src="https://img.shields.io/badge/iOS-27%2B-000?logo=ios&logoColor=white" alt="iOS 27+">
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-000?logo=modelcontextprotocol&logoColor=white" alt="MCP server"></a>
-  <a href="https://github.com/jiefeng-ai/phonectl-mcp/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/jiefeng-ai/phonectl-mcp/test.yml?branch=main&label=tests&logo=githubactions&logoColor=white" alt="Tests"></a>
-  <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jiefeng-ai/phonectl-mcp" alt="License: MIT"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/actions/workflows/test.yml"><img src="https://github.com/jiefeng-ai/phonectl-mcp/actions/workflows/test.yml/badge.svg?branch=main" alt="Tests"></a>
+  <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
 </p>
 
 <p align="center"><a href="#install">Install</a> · <a href="#tools">Tools</a> · <a href="#troubleshooting">Troubleshooting</a> · <a href="#security">Security</a> · <a href="https://github.com/jiefeng-ai/phonectl-mcp/blob/main/README.zh-CN.md">中文</a></p>
