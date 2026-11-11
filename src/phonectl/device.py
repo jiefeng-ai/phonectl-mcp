@@ -7,6 +7,7 @@ Touch and keyboard need iOS 27+: they go through the same HID path as Xcode's mi
 window, which only lets input through while a screen media stream is running. That stream
 is opened on the first input (~0.6 s), held while input keeps coming (a tap is then ~50 ms),
 and closed after TOUCH_IDLE_S without input, so the phone isn't left mirroring for nothing.
+The virtual keyboard is attached on the first key and detached after KEY_IDLE_S without one.
 Input is fire-and-forget: nothing confirms a tap landed, so callers verify with a screenshot.
 """
 
@@ -60,6 +61,10 @@ NORM_MAX = 65535
 # How long the input stream stays open without input. 45 s was verified to still deliver taps;
 # longer idle sessions were less reliable, so keep them short.
 TOUCH_IDLE_S = float(os.environ.get("PHONECTL_TOUCH_IDLE", "30"))
+# The virtual keyboard is dropped after this long without a key, while touch stays up. Some apps
+# (Xianyu's chat) drop text focus while a hardware keyboard is attached, and iOS hides the
+# on-screen keyboard; without one attached the phone behaves as it does in the hand.
+KEY_IDLE_S = float(os.environ.get("PHONECTL_KEY_IDLE", "5"))
 FRAME_S = 0.016  # one touch sample per display frame while dragging
 KEY_HOLD_S = 0.04  # key down -> up, as pymobiledevice3's `type` does
 KEY_GAP_S = 0.02  # between keys
@@ -165,7 +170,11 @@ class Device:
         # Touch/keyboard session, opened on demand and closed when idle (see module doc).
         self._touch_stack: Optional[AsyncExitStack] = None
         self._touch: Optional[UniversalHIDServiceService] = None
+        # The keyboard has its own HID connection, so it can be detached on its own.
+        self._kb_stack: Optional[AsyncExitStack] = None
+        self._kb: Optional[UniversalHIDServiceService] = None
         self._keyboard_id: Optional[int] = None
+        self._key_last = 0.0
         self._touch_last = 0.0
         self._reaper: Optional[asyncio.Task] = None
 
@@ -315,24 +324,38 @@ class Device:
 
     # --- touch and keyboard (iOS 27+) -------------------------------------------------
 
+    async def _close_keyboard(self) -> None:
+        if self._kb_stack is not None:
+            stack, self._kb_stack, self._kb, self._keyboard_id = self._kb_stack, None, None, None
+            await stack.aclose()
+
     async def _close_touch(self) -> None:
+        await self._close_keyboard()
         if self._touch_stack is not None:
-            stack, self._touch_stack, self._touch, self._keyboard_id = self._touch_stack, None, None, None
+            stack, self._touch_stack, self._touch = self._touch_stack, None, None
             await stack.aclose()
 
     async def _reap_idle_touch(self) -> None:
         while True:
-            await asyncio.sleep(min(5.0, TOUCH_IDLE_S))
+            await asyncio.sleep(min(1.0, KEY_IDLE_S, TOUCH_IDLE_S))
             async with self._lock:
                 if self._touch is None:
                     return
-                if time.monotonic() - self._touch_last >= TOUCH_IDLE_S:
+                now = time.monotonic()
+                if now - self._touch_last >= TOUCH_IDLE_S:
                     log.info("closing touch session after %.0f s idle", TOUCH_IDLE_S)
                     await self._close_touch()
                     return
+                if self._kb is not None and now - self._key_last >= KEY_IDLE_S:
+                    log.info("detaching the keyboard after %.0f s without a key", KEY_IDLE_S)
+                    await self._close_keyboard()
 
-    async def _input(self, op: InputOp, extra_s: float = 0.0) -> None:
-        """Run op on the touch session, opening it (and the idle reaper) if needed."""
+    async def _input(self, op: InputOp, extra_s: float = 0.0, keyboard: bool = False) -> None:
+        """Run op on the touch session, opening it (and the idle reaper) if needed.
+
+        With keyboard=True, op gets the keyboard's connection instead, and its service id is in
+        self._keyboard_id. The keyboard is attached on first use and detached after KEY_IDLE_S.
+        """
 
         async def run():
             if self._touch is None:
@@ -350,7 +373,22 @@ class Device:
                 self._touch_stack = stack
                 if self._reaper is None or self._reaper.done():
                     self._reaper = asyncio.create_task(self._reap_idle_touch())
-            await _run_counted(self._touch, op)
+            if keyboard:
+                if self._kb is None:
+                    stack = AsyncExitStack()
+                    try:
+                        # Opened inside the touch session: its media stream is what lets the
+                        # keyboard's reports through.
+                        kb = await _enter_bounded(stack, UniversalHIDServiceService(self._rsd), "keyboard")
+                        self._keyboard_id = await kb.create_keyboard_service()
+                    except BaseException:
+                        await stack.aclose()
+                        raise
+                    self._kb_stack, self._kb = stack, kb
+                await _run_counted(self._kb, op)
+                self._key_last = time.monotonic()
+            else:
+                await _run_counted(self._touch, op)
             self._touch_last = time.monotonic()
 
         await self._retry(run, extra_s=extra_s, repeatable=False)
@@ -379,11 +417,6 @@ class Device:
 
         await self._input(op, extra_s=duration_s)
 
-    async def _keyboard(self, t: UniversalHIDServiceService) -> int:
-        if self._keyboard_id is None:
-            self._keyboard_id = await t.create_keyboard_service()
-        return self._keyboard_id
-
     async def _press(self, t: UniversalHIDServiceService, kb: int, mods: tuple[int, ...], usage: int) -> None:
         # iOS can miss a modifier that arrives in the same report as the key, so hold it first.
         if mods:
@@ -398,9 +431,9 @@ class Device:
         """Press one key with modifiers (bits as in keys.MODS) on the virtual keyboard."""
 
         async def op(t: UniversalHIDServiceService):
-            await self._press(t, await self._keyboard(t), modifier_usages(mod_bits), usage)
+            await self._press(t, self._keyboard_id, modifier_usages(mod_bits), usage)
 
-        await self._input(op)
+        await self._input(op, keyboard=True)
 
     async def type_ascii(self, text: str) -> None:
         """Type printable ASCII (plus \\n and \\t) on the virtual keyboard, US layout."""
@@ -409,9 +442,9 @@ class Device:
             raise ValueError(f"not typeable on the virtual keyboard: {''.join(bad)!r}")
 
         async def op(t: UniversalHIDServiceService):
-            kb = await self._keyboard(t)
+            kb = self._keyboard_id
             for c in text:
                 usage, shift = ASCII_TO_HID[c]
                 await self._press(t, kb, (KEY_LEFT_SHIFT,) if shift else (), usage)
 
-        await self._input(op, extra_s=len(text) * TYPE_S_PER_CHAR)
+        await self._input(op, extra_s=len(text) * TYPE_S_PER_CHAR, keyboard=True)

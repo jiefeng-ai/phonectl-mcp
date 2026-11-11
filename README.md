@@ -130,6 +130,7 @@ Run `phonectl doctor` first. It tells you which link is broken.
 | `PHONECTL_OCR_LANGS` | `zh-Hans,en-US` | `read_text` languages, in priority order |
 | `PHONECTL_SETTLE` | `0.6` | Seconds to wait before the screenshot after an action |
 | `PHONECTL_TOUCH_IDLE` | `30` | Idle seconds before the input stream closes (reopening takes ~0.6 s) |
+| `PHONECTL_KEY_IDLE` | `5` | Seconds without a key before the virtual keyboard detaches, so the on-screen keyboard comes back |
 | `PHONECTL_CALL_TIMEOUT` | `15` | Seconds to wait for the phone, on top of the gesture time |
 | `PHONECTL_LOG` | `WARNING` | Log level (`INFO` for the service); logs in `~/Library/Logs/phonectl*.log` |
 
