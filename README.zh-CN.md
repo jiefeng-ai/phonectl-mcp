@@ -106,8 +106,8 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 | --- | --- |
 | 找不到 iPhone | 换能传数据的线，解锁手机后重插 |
 | 提示 Mac 未被信任 | 解锁手机，重插线，点「信任」 |
-| 找不到「开发者模式」 | 手机连着 Mac 时打开一次 Xcode，之后「设置 › 隐私与安全性」里会出现开关 |
-| 截图失败（比如手机重启后） | 插上线，运行 `phonectl doctor --fix` 装上开发者磁盘镜像 |
+| 找不到「开发者模式」 | 运行 `phonectl doctor --fix`，「设置 › 隐私与安全性」里会出现开关 |
+| 磁盘镜像安装失败 | 服务第一次连上手机时会从 GitHub 下载并安装开发者磁盘镜像；检查网络或代理，再运行 `phonectl restart` |
 | 点了没反应 | 需要 iOS 27 及以上；保持屏幕亮着、不锁屏 |
 | 客户端连不上 | `phonectl restart`，再看 `~/Library/Logs/phonectl.error.log`。返回 401 说明客户端的令牌和 `~/.config/phonectl/token` 不一致 |
 

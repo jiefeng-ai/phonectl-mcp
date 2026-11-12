@@ -20,7 +20,7 @@ import time
 from contextlib import AsyncExitStack
 from typing import Any, Awaitable, Callable, Optional
 
-from pymobiledevice3.exceptions import ConnectionTerminatedError
+from pymobiledevice3.exceptions import AlreadyMountedError, ConnectionTerminatedError
 from pymobiledevice3.remote import native_tunnel, userspace_tunnel
 from pymobiledevice3.remote.core_device.app_service import AppServiceService
 from pymobiledevice3.remote.core_device.hid_service import (
@@ -42,6 +42,12 @@ from pymobiledevice3.remote.core_device.pasteboard_service import (
 )
 from pymobiledevice3.services.dvt.instruments.dvt_provider import DvtProvider
 from pymobiledevice3.services.dvt.instruments.screenshot import Screenshot
+from pymobiledevice3.services.cryptexd import CryptexdService, fetch_cryptex_ddi
+from pymobiledevice3.services.mobile_image_mounter import (
+    PersonalizedImageMounter,
+    fetch_personalized_ddi,
+    uses_cryptex_image,
+)
 
 log = logging.getLogger(__name__)
 
@@ -76,6 +82,10 @@ CALL_TIMEOUT_S = float(os.environ.get("PHONECTL_CALL_TIMEOUT", "15"))
 # work runs in threads that a cancel would not stop); the steps after it get these.
 USERSPACE_TIMEOUT_S = 30.0
 DVT_OPEN_TIMEOUT_S = 15.0
+# Each of the two steps of installing the developer disk image (download, ~16 MB from
+# GitHub; then personalizing and installing it) gets this long. With the image check and DVT
+# a first connect stays under 300 s, the read timeout of doctor's MCP client.
+DISK_IMAGE_TIMEOUT_S = 120.0
 # Each teardown step (touch session, DVT, tunnel) gets this long; a dead link can leave a
 # goodbye message unanswered forever, e.g. stopping the media stream behind touch.
 CLOSE_TIMEOUT_S = 5.0
@@ -151,6 +161,54 @@ async def _enter_bounded(stack: AsyncExitStack, cm: Any, what: str) -> Any:
 _MOD_USAGE_BASE = 0xE0
 
 
+class DiskImageDownloadError(RuntimeError):
+    """The developer disk image could not be downloaded; reconnecting at once will not help."""
+
+
+async def _ensure_disk_image(rsd: Any) -> None:
+    """Install the developer disk image if the phone lacks it; DVT (screenshots) needs it.
+
+    A phone that has never met Xcode has none. On iOS 27 it is a cryptex that stays installed
+    across restarts, so this normally installs it once per phone. Installing needs the tunnel
+    (plain usbmux is refused), and the phone takes one tunnel at a time, so the server does it
+    here rather than doctor.
+    """
+    try:
+        async with asyncio.timeout(DVT_OPEN_TIMEOUT_S):
+            async with PersonalizedImageMounter(lockdown=rsd) as mounter:
+                if await mounter.is_image_mounted(mounter.IMAGE_TYPE):
+                    return
+    except Exception as e:  # noqa: BLE001 - if the image is really missing, DVT below says so
+        log.warning("developer disk image check failed (%r); opening DVT anyway", e)
+        return
+    log.info("developer disk image not installed; installing it")
+    # pymobiledevice3's own download is a blocking requests.get without a timeout, on the event
+    # loop, which would freeze every client. So it is downloaded here in a thread, and the
+    # install is handed the files: auto_mount would download again whenever the image on GitHub
+    # is newer than the build id pymobiledevice3 expects, since it then treats its cache as stale.
+    cryptex = uses_cryptex_image(rsd)
+    try:
+        async with asyncio.timeout(DISK_IMAGE_TIMEOUT_S):
+            image = await asyncio.to_thread(fetch_cryptex_ddi if cryptex else fetch_personalized_ddi)
+    except Exception as e:
+        raise DiskImageDownloadError(
+            f"downloading the developer disk image from GitHub failed ({e!r}); "
+            "check the network or proxy, then `phonectl restart`"
+        ) from e
+    try:
+        async with asyncio.timeout(DISK_IMAGE_TIMEOUT_S):
+            if cryptex:  # iOS 27+
+                await CryptexdService(rsd).auto_install_ddi(restore_dir=image)
+            else:
+                async with PersonalizedImageMounter(lockdown=rsd) as mounter:
+                    await mounter.mount(*image)
+    except AlreadyMountedError:
+        # The image mounter said no image, but cryptexd has one installed.
+        log.info("developer disk image already installed as a cryptex")
+        return
+    log.info("developer disk image installed")
+
+
 def modifier_usages(mod_bits: int) -> tuple[int, ...]:
     return tuple(_MOD_USAGE_BASE + i for i in range(8) if mod_bits >> i & 1)
 
@@ -204,6 +262,7 @@ class Device:
                 self.transport = "userspace"
                 if hasattr(rsd, "close"):
                     stack.push_async_callback(_close_bounded, "userspace tunnel", rsd.close)
+            await _ensure_disk_image(rsd)
             try:
                 async with asyncio.timeout(DVT_OPEN_TIMEOUT_S):
                     dvt = await _enter_bounded(stack, DvtProvider(rsd), "DVT session")
@@ -229,6 +288,8 @@ class Device:
     async def _reconnect(self) -> None:
         try:
             await self.connect()
+        except DiskImageDownloadError:
+            raise  # a second try would only download for minutes more while every client waits
         except Exception as e:  # noqa: BLE001 - any failure gets the one retry below
             log.warning("reconnect failed (%r); trying again in %.0f s", e, RECONNECT_BACKOFF_S)
             await asyncio.sleep(RECONNECT_BACKOFF_S)

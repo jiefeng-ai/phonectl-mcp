@@ -215,7 +215,8 @@ async def _server_status(srv, url: str) -> str:
 async def _usb_checks(r: _Report, usb: list, fix: bool) -> bool:
     """Trust, iOS version, Developer Mode and the disk image, through usbmux. False: stop here."""
     from pymobiledevice3.lockdown import create_using_usbmux
-    from pymobiledevice3.services.mobile_image_mounter import MobileImageMounterService, auto_mount
+    from pymobiledevice3.services.amfi import AmfiService
+    from pymobiledevice3.services.mobile_image_mounter import MobileImageMounterService
 
     r.ok(f"iPhone on USB ({len(usb)} found{', using the first' if len(usb) > 1 else ''})")
     try:
@@ -243,10 +244,23 @@ async def _usb_checks(r: _Report, usb: list, fix: bool) -> bool:
             return False
         if await ld.get_developer_mode_status():
             r.ok("Developer Mode is on")
+        elif fix:
+            # A phone that has never met Xcode hides the switch; this makes Settings show it.
+            # Turning it on is left to the user, on the phone.
+            try:
+                await AmfiService(ld).reveal_developer_mode_option_in_ui()
+            except Exception as e:  # noqa: BLE001
+                r.fail(f"Developer Mode is off, and showing its switch failed ({e!r})",
+                       "Unlock the phone, replug the cable and run `phonectl doctor --fix` again.")
+                return False
+            r.fail("Developer Mode is off; its switch is now shown",
+                   "On the phone: Settings > Privacy & Security > Developer Mode, turn it on and restart, "
+                   "then run doctor again.")
+            return False
         else:
             r.fail("Developer Mode is off",
                    "On the phone: Settings > Privacy & Security > Developer Mode, turn it on and restart. "
-                   "If the switch is missing, open Xcode once with the phone connected.")
+                   "If the switch is missing, run `phonectl doctor --fix` to show it.")
             return False
         try:
             async with MobileImageMounterService(lockdown=ld) as m:
@@ -255,18 +269,11 @@ async def _usb_checks(r: _Report, usb: list, fix: bool) -> bool:
             r.fail(f"cannot check the developer disk image ({e!r})", "Unlock the phone and run doctor again.")
             return False
         if mounted:
-            r.ok("developer disk image is mounted")
-        elif fix:
-            print("        mounting the developer disk image (downloads it the first time)...")
-            try:
-                await auto_mount(ld)
-                r.ok("developer disk image mounted")
-            except Exception as e:  # noqa: BLE001
-                r.fail(f"mounting failed ({e!r})",
-                       "Keep the phone unlocked and online, then retry; or open Xcode once with the phone connected.")
+            r.ok("developer disk image is installed")
         else:
-            r.fail("developer disk image is not mounted (screenshots need it)",
-                   "Run `phonectl doctor --fix`, or open Xcode once with the phone connected.")
+            # Installing it needs the tunnel, which only the server may hold: it installs the
+            # image when it connects, and the server check below makes it connect.
+            r.warn("developer disk image is not installed yet; the server installs it below")
     finally:
         await ld.close()
 
@@ -326,7 +333,7 @@ async def _doctor(fix: bool) -> int:
         r.ok(f"server at {url} reaches the phone" + ("" if usb else " over Wi-Fi"))
         if not usb:
             r.warn("trust, Developer Mode and the disk image were not checked: they need the cable",
-                   "Plug in the cable and run doctor again to check them, or to mount the disk image with --fix.")
+                   "Plug in the cable and run doctor again to check them.")
     elif not usb:
         r.fail("the phone is neither on USB nor reachable over Wi-Fi:\n        " + status.replace("\n", "\n        "),
                "Connect it with a data cable (not charge-only) and unlock it. For Wi-Fi, set it up over "
@@ -349,7 +356,7 @@ def main() -> None:
     sub.add_parser("uninstall-service", help="stop the server and remove the launchd job").set_defaults(fn=uninstall_service)
     sub.add_parser("restart", help="restart the server").set_defaults(fn=restart)
     d = sub.add_parser("doctor", help="check the phone, the USB link and the server")
-    d.add_argument("--fix", action="store_true", help="mount the developer disk image if it is missing")
+    d.add_argument("--fix", action="store_true", help="show the Developer Mode switch in Settings if it is missing")
     d.set_defaults(fn=doctor)
     args = ap.parse_args()
     sys.exit(args.fn(args))
