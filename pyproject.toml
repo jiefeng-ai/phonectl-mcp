@@ -1,6 +1,6 @@
 [project]
 name = "phonectl-mcp"
-version = "0.1.4"
+version = "0.1.5"
 description = "MCP server that lets AI agents see and drive a real iPhone over USB: screenshots, on-screen text, taps, swipes, typing, apps."
 readme = "README.md"
 license = "MIT"

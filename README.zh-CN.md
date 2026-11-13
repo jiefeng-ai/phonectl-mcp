@@ -133,6 +133,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 | `PHONECTL_OCR_LANGS` | `zh-Hans,en-US` | `read_text` 识别语言，按优先级 |
 | `PHONECTL_SETTLE` | `0.6` | 操作后等几秒再截图 |
 | `PHONECTL_TOUCH_IDLE` | `30` | 空闲几秒后关闭输入通道（重开约 0.6 秒） |
+| `PHONECTL_KEY_IDLE` | `5` | 几秒没按键后断开虚拟键盘，屏幕键盘随之回来 |
 | `PHONECTL_CALL_TIMEOUT` | `15` | 等手机响应几秒算失败（不含手势耗时） |
 | `PHONECTL_LOG` | `WARNING` | 日志级别（服务为 `INFO`），日志在 `~/Library/Logs/phonectl*.log` |
 
