@@ -82,8 +82,6 @@ Restart the client so it loads the server, then ask your agent for a screenshot 
 
 After one setup over the cable, it also works over Wi-Fi while the phone and the Mac share a network.
 
-All agents and scripts share this one server, since the phone takes a single control connection; let one agent drive at a time.
-
 ## Tools
 
 Coordinates are iOS points, the same as the pixels of the returned screenshot.

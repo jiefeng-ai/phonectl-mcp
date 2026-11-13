@@ -82,8 +82,6 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 用数据线设置过一次后，手机和 Mac 在同一个 Wi-Fi 下就可以不插线。
 
-手机只接受一条控制连接，所以所有 agent 和脚本共用这一个服务；同一时间只让一个 agent 操作。
-
 ## 工具
 
 坐标单位是 iOS 的 point，和返回的截图像素一一对应。
