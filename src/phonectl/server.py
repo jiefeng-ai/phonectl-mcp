@@ -301,6 +301,14 @@ class _BearerAuth:
                                         (b"www-authenticate", b'Bearer realm="phonectl"')]})
                 await send({"type": "http.response.body", "body": b"unauthorized\n"})
             return
+        if scope["type"] == "http" and scope["method"] == "GET":
+            # The GET stream only carries messages the server starts, and a stateless server
+            # never starts any. Refusing it (the spec allows 405) leaves no connection open
+            # between calls, so a restart is unseen by clients instead of cutting their stream.
+            await send({"type": "http.response.start", "status": 405,
+                        "headers": [(b"allow", b"POST, DELETE"), (b"content-type", b"text/plain")]})
+            await send({"type": "http.response.body", "body": b"no server-to-client stream\n"})
+            return
         await self.app(scope, receive, send)
 
 
