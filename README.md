@@ -109,6 +109,7 @@ Run `phonectl doctor` first. It tells you which link is broken.
 | No Developer Mode switch | Run `phonectl doctor --fix`; the switch appears under Settings › Privacy & Security |
 | Disk image install fails | The server installs the developer disk image on first connect and downloads it from GitHub; check the network or proxy, then `phonectl restart` |
 | Taps do nothing | Needs iOS 27+; keep the screen on and unlocked |
+| Wi-Fi link drops | A locked phone leaves the network for up to minutes at a time. Unlock it and wait a few seconds |
 | Clients cannot connect | `phonectl restart`, then check `~/Library/Logs/phonectl.error.log`. A 401 means the client's token differs from `~/.config/phonectl/token` |
 
 ## Security

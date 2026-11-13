@@ -337,7 +337,8 @@ async def _doctor(fix: bool) -> int:
     elif not usb:
         r.fail("the phone is neither on USB nor reachable over Wi-Fi:\n        " + status.replace("\n", "\n        "),
                "Connect it with a data cable (not charge-only) and unlock it. For Wi-Fi, set it up over "
-               "the cable once and keep the phone and the Mac on the same network.")
+               "the cable once and keep the phone and the Mac on the same network. A locked phone "
+               "keeps dropping off Wi-Fi: unlock it and wait a few seconds.")
     else:
         r.fail("the server is up but cannot reach the phone:\n        " + status.replace("\n", "\n        "),
                "Replug the cable, unlock the phone, then `phonectl restart`.")

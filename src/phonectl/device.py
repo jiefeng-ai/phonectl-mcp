@@ -20,7 +20,12 @@ import time
 from contextlib import AsyncExitStack
 from typing import Any, Awaitable, Callable, Optional
 
-from pymobiledevice3.exceptions import AlreadyMountedError, ConnectionTerminatedError
+from pymobiledevice3.exceptions import (
+    AlreadyMountedError,
+    ConnectionTerminatedError,
+    CoreDeviceError,
+    NoDeviceConnectedError,
+)
 from pymobiledevice3.remote import native_tunnel, userspace_tunnel
 from pymobiledevice3.remote.core_device.app_service import AppServiceService
 from pymobiledevice3.remote.core_device.hid_service import (
@@ -52,10 +57,11 @@ from pymobiledevice3.services.mobile_image_mounter import (
 log = logging.getLogger(__name__)
 
 # (usage_page, usage_code, hold_seconds), as used by pymobiledevice3's `hid button`.
-# Lock and Siri need a longer hold or iOS reads them as bounce.
+# Siri needs a long hold. Lock needs a short one: held 0.5 s it did nothing on iOS 27.2,
+# held 0.05 s it locked the phone.
 BUTTONS: dict[str, tuple[int, int, float]] = {
     "home": (0x0C, 0x40, 0.05),
-    "lock": (0x0C, 0x30, 0.5),
+    "lock": (0x0C, 0x30, 0.05),
     "volume-up": (0x0C, 0xE9, 0.05),
     "volume-down": (0x0C, 0xEA, 0.05),
     "mute": (0x0C, 0xE2, 0.05),
@@ -92,6 +98,10 @@ CLOSE_TIMEOUT_S = 5.0
 # remoted may be mid-redial when we reconnect (it and we evict each other's RSD connection),
 # so a failed reconnect is tried once more after this pause.
 RECONNECT_BACKOFF_S = 1.0
+# CoreDevice's launch error "the process identifier of the launched application could not be
+# determined". The app did open (seen with com.apple.Translate on iOS 27.2); only the pid
+# lookup after the launch failed, so launch_app treats it as success.
+LAUNCHED_PID_UNKNOWN = 10004
 # Upper bound on how long typing one character takes (holds, gap, and the sends themselves).
 TYPE_S_PER_CHAR = 0.15
 
@@ -251,6 +261,7 @@ class Device:
                 stack.push_async_callback(_close_bounded, "native tunnel", tunnel.aclose)
                 self.transport = "native"
             except Exception as e:  # noqa: BLE001 - any native failure means "use userspace"
+                native_error = e
                 log.info("native tunnel unavailable (%r), using userspace", e)
                 try:
                     async with asyncio.timeout(USERSPACE_TIMEOUT_S):
@@ -259,6 +270,13 @@ class Device:
                         )
                 except TimeoutError:
                     raise ConnectionError(f"userspace tunnel not up after {USERSPACE_TIMEOUT_S:.0f} s") from None
+                except NoDeviceConnectedError as e:
+                    # The userspace tunnel only knows USB, so the native error is the one that
+                    # explains a phone that is on Wi-Fi only.
+                    raise ConnectionError(
+                        f"phone not found (Wi-Fi: {native_error}; USB: {e}). Over Wi-Fi a locked "
+                        "phone keeps dropping off the network: unlock it and wait a few seconds"
+                    ) from e
                 self.transport = "userspace"
                 if hasattr(rsd, "close"):
                     stack.push_async_callback(_close_bounded, "userspace tunnel", rsd.close)
@@ -340,7 +358,13 @@ class Device:
         # that, since it throws away whatever screen the app was on.
         async def op():
             async with AppServiceService(self._rsd) as apps:
-                return await apps.launch_application(bundle_id, kill_existing=restart)
+                try:
+                    return await apps.launch_application(bundle_id, kill_existing=restart)
+                except CoreDeviceError as e:
+                    if e.code != LAUNCHED_PID_UNKNOWN:
+                        raise
+                    log.info("%s launched, but CoreDevice could not tell its pid", bundle_id)
+                    return []
 
         return await self._retry(op)
 
