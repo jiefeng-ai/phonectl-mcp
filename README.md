@@ -15,12 +15,12 @@
 
 <p align="center"><a href="#install">Install</a> · <a href="#tools">Tools</a> · <a href="#troubleshooting">Troubleshooting</a> · <a href="#security">Security</a></p>
 
-An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone connected to your Mac. Nothing to install on the phone, no jailbreak.
+An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, apps and the clipboard on an iPhone connected to your Mac. Nothing to install on the phone.
 
 <table align="center">
   <tr>
     <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif?v=2" width="260" alt="An AI agent makes a rednote post through phonectl-mcp: text card, template, stickers, filter, title and caption"></td>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=4" width="260" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=5" width="260" alt="A script applies to one job in the BOSS Zhipin app through phonectl-mcp, reading the screen with read_text and tapping"></td>
   </tr>
   <tr>
     <td align="center"><sub>An AI agent makes a rednote post: text card, template, stickers, filter, caption. It stops before <b>Post</b>. Sped up.</sub></td>
@@ -32,7 +32,7 @@ An MCP server for screenshots, on-screen text, taps, swipes, typing, buttons, ap
 
 - A Mac with [uv](https://docs.astral.sh/uv/)
 - An iPhone on **iOS 27 or later**, with Developer Mode on
-- A USB data cable (not a charge-only one) for the first setup. After that, Wi-Fi works too
+- A USB data cable for the first setup. After that, Wi-Fi works too
 
 Tested on an iPhone 17 Pro with iOS 27.2 and macOS 27.
 
@@ -42,9 +42,13 @@ Tested on an iPhone 17 Pro with iOS 27.2 and macOS 27.
 
 Paste this to your coding agent (Claude Code, Codex, Cursor…):
 
-> Install phonectl-mcp by following https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand, then add it to your MCP config and take a screenshot of my phone to check it works. When I need to do something on the phone, tell me step by step and wait for me.
+> Install phonectl-mcp by following https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand and add it to your MCP config. Run `phonectl doctor` until it passes. When I need to do something on the phone, tell me step by step and wait for me. Finally, tell me how to restart you so the phone tools load.
+
+After the restart, ask the agent for a screenshot of the phone.
 
 ### Install by hand
+
+Run all three:
 
 ```sh
 uv tool install phonectl-mcp
@@ -52,7 +56,7 @@ phonectl install-service   # runs the server at login on http://127.0.0.1:47321/
 phonectl doctor            # checks cable, trust, Developer Mode, disk image and server
 ```
 
-`install-service` also creates an access token in `~/.config/phonectl/token`. Then connect your client:
+`install-service` also creates an access token in `~/.config/phonectl/token`. Then add the server to the client you use:
 
 **Claude Code**
 
@@ -74,7 +78,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 }
 ```
 
-To check, ask your agent to take a screenshot of the phone.
+Restart the client so it loads the server, then ask your agent for a screenshot of the phone.
 
 After one setup over the cable, it also works over Wi-Fi while the phone and the Mac share a network.
 
@@ -148,7 +152,7 @@ uv sync
 uv run pytest
 ```
 
-`uv run phonectl install-service` from the clone runs your working copy as the service.
+To make the background service run your clone instead of the PyPI release, run `uv run phonectl install-service` inside the clone.
 
 ## License
 

@@ -15,12 +15,12 @@
 
 <p align="center"><a href="#安装">安装</a> · <a href="#工具">工具</a> · <a href="#排查问题">排查问题</a> · <a href="#安全">安全</a></p>
 
-一个 MCP 服务，对连着 Mac 的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西，也不用越狱。
+一个 MCP 服务，对连着 Mac 的 iPhone 截图、读屏幕文字、点按、滑动、打字、按按钮、启动 App、读写剪贴板。手机上不用装东西。
 
 <table align="center">
   <tr>
     <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo-rednote.gif?v=2" width="260" alt="AI agent 通过 phonectl-mcp 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、标题和正文"></td>
-    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=4" width="260" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></td>
+    <td align="center" width="50%"><img src="https://raw.githubusercontent.com/jiefeng-ai/phonectl-mcp/main/docs/demo.gif?v=5" width="260" alt="脚本通过 phonectl-mcp 在 BOSS 直聘里投递一个岗位：用 read_text 读屏、用 tap 点按"></td>
   </tr>
   <tr>
     <td align="center"><sub>AI agent 在小红书做一篇图文：文字卡片、模板、贴纸、滤镜、正文，停在<b>发布</b>前。已加速。</sub></td>
@@ -32,7 +32,7 @@
 
 - 一台装了 [uv](https://docs.astral.sh/uv/) 的 Mac
 - 一台 **iOS 27 或以上**的 iPhone，打开「开发者模式」
-- 一根能传数据的 USB 线（只能充电的不行），首次设置时要用；之后走 Wi-Fi 也行
+- 一根 USB 数据线，首次设置时要用；之后走 Wi-Fi 也行
 
 已在 iPhone 17 Pro（iOS 27.2）+ macOS 27 上测试。
 
@@ -42,9 +42,13 @@
 
 把下面这段话发给你的编程 agent（Claude Code、Codex、Cursor 等）：
 
-> 按 https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand 安装 phonectl-mcp，然后把它加进你的 MCP 配置，截一张我的手机屏幕确认能用。需要我在手机上操作时，一步步告诉我，等我做完再继续。
+> 按 https://github.com/jiefeng-ai/phonectl-mcp#install-by-hand 安装 phonectl-mcp，并把它加进你的 MCP 配置。运行 `phonectl doctor`，直到全部通过。需要我在手机上操作时，一步步告诉我，等我做完再继续。最后告诉我怎么重启你，让手机工具加载进来。
+
+重启之后，让 agent 截一张手机屏幕试试。
 
 ### 手动安装
+
+三条都要执行：
 
 ```sh
 uv tool install phonectl-mcp
@@ -52,7 +56,7 @@ phonectl install-service   # 开机自启服务，地址 http://127.0.0.1:47321/
 phonectl doctor            # 检查数据线、信任、开发者模式、磁盘镜像和服务
 ```
 
-`install-service` 还会在 `~/.config/phonectl/token` 生成访问令牌。然后接入客户端：
+`install-service` 还会在 `~/.config/phonectl/token` 生成访问令牌。然后把服务加进你用的那个客户端：
 
 **Claude Code**
 
@@ -74,7 +78,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 }
 ```
 
-装好后，让 agent 截一张手机屏幕试试。
+重启客户端让它加载服务，再让 agent 截一张手机屏幕试试。
 
 用数据线设置过一次后，手机和 Mac 在同一个 Wi-Fi 下就可以不插线。
 
@@ -109,6 +113,7 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 | 找不到「开发者模式」 | 运行 `phonectl doctor --fix`，「设置 › 隐私与安全性」里会出现开关 |
 | 磁盘镜像安装失败 | 服务第一次连上手机时会从 GitHub 下载并安装开发者磁盘镜像；检查网络或代理，再运行 `phonectl restart` |
 | 点了没反应 | 需要 iOS 27 及以上；保持屏幕亮着、不锁屏 |
+| Wi-Fi 连接断开 | 手机锁屏后会断断续续离开网络，一次可达几分钟。解锁后等几秒 |
 | 客户端连不上 | `phonectl restart`，再看 `~/Library/Logs/phonectl.error.log`。返回 401 说明客户端的令牌和 `~/.config/phonectl/token` 不一致 |
 
 ## 安全
@@ -146,7 +151,7 @@ uv sync
 uv run pytest
 ```
 
-在仓库目录里执行 `uv run phonectl install-service`，服务就会跑你本地的代码。
+想让后台服务跑你本地的代码、而不是 PyPI 上的发布版，在仓库目录里执行 `uv run phonectl install-service`。
 
 ## 协议
 
