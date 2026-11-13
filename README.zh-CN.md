@@ -140,17 +140,6 @@ claude mcp add --scope user --transport http phone http://127.0.0.1:47321/mcp \
 
 其他命令：`phonectl restart`（比如 `uv tool upgrade phonectl-mcp` 升级之后）。卸载：`phonectl uninstall-service`、`uv tool uninstall phonectl-mcp`，再删掉 `~/.config/phonectl`。
 
-## 开发
-
-```sh
-git clone https://github.com/jiefeng-ai/phonectl-mcp
-cd phonectl-mcp
-uv sync
-uv run pytest
-```
-
-想让后台服务跑你本地的代码、而不是 PyPI 上的发布版，在仓库目录里执行 `uv run phonectl install-service`。
-
 ## 协议
 
 MIT

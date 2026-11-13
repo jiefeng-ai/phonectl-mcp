@@ -141,17 +141,6 @@ Run `phonectl doctor` first. It tells you which link is broken.
 
 Other commands: `phonectl restart` (e.g. after `uv tool upgrade phonectl-mcp`). To remove: `phonectl uninstall-service`, `uv tool uninstall phonectl-mcp`, and delete `~/.config/phonectl`.
 
-## Development
-
-```sh
-git clone https://github.com/jiefeng-ai/phonectl-mcp
-cd phonectl-mcp
-uv sync
-uv run pytest
-```
-
-To make the background service run your clone instead of the PyPI release, run `uv run phonectl install-service` inside the clone.
-
 ## License
 
 MIT
